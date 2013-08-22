@@ -1,6 +1,6 @@
-500px-like Photo Uploader
+# 500px-like Photo Uploader
 
-Build a photo uploader with 500px flavours. Made with these spicy
+## Build a photo uploader with 500px flavours. Made with these spicy
 
 * [Jquery](https://)
 
