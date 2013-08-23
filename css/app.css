@@ -11,7 +11,7 @@ body {
   font-family: 'Lato', Calibri, Arial, sans-serif;
 }
 .block-hide{
-  display: none;
+  display: none!important;
 }
 textarea{resize: none}
 
@@ -26,6 +26,9 @@ textarea{resize: none}
 }
 .browse_files{
   text-decoration: underline;
+}
+.navbar-brand{
+  color: #fff !important;
 }
 
 /* Preview zone */
