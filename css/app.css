@@ -47,6 +47,10 @@ textarea{resize: none}
 .thumbnails-holder .upload-thumbnail{
   display: block;
   float: left;
+  height: 64px;
+  width: 64px;
+  overflow: hidden;
+  border-radius: none;
 }
 .thumbnails-holder .active{
   border-bottom: 2px solid #428bca;

@@ -27,7 +27,7 @@ $(function () {
 
 function setupUploader() {
 	// foursquareHelper.initialize(window.foursquareClientId, window.foursquareSecret);
-	var jqXHR, countUpload = 0, is1stFile = true;
+	var jqXHR, uploadIndex = 0;
 
 	$('#fileupload').fileupload({
 		progressInterval : 50,
@@ -48,53 +48,58 @@ function setupUploader() {
 			//Read photo at client
 			$.each(data.files, function(index, file) {
 				canvasResize(file, {
-					width: 0,
-					height: 300,
+					width: 1140,
+					height: 0,
 					crop: false,
 					quality: 90,
 					//rotate: 90,
 					callback: function(imageData, width, height, exifData) {
-						// var currNbPhoto = $lstThumb.find('.item').length;
-						// if (currNbPhoto >= 9) {
-						// 	$('.uploadOther').hide();
-						// }
-						// if (currNbPhoto >= 10) {
-						// 	return true;
-						// }
+						debug(exifData);
+						// Eliminate number of files (10)
+						if (filesToUpload.length >= 10) {
+							alert('Exceed max of 10 files. Aborted !');
+							return true;
+						}
 
-						//Restrict file size
-						if (file.size >= 10000000){//10MB
-							alert('File ' + file.name + ' is larger than 10MB');
+						// Restrict file size
+						if (file.size >= 10000000) {// 10MB
+							alert('File ' + file.name + ' is larger than 10MB. Aborted !');
 							return false;
 						}
 
-						//Restrict file type
+						// Restrict file type: JPG only
 						if (!file.type.match(/(\.|\/)(jpe?g)$/i)) {
 							alert('File type is not supported');
 							return false;
 						}
 
-						countUpload++;
-						// var is1stFile = false;
-						if ($lstThumb.find('.active').length == 0) is1stFile = true;
+						var is1stFile = false;
+						if (filesToUpload.length == 0) {
+							is1stFile = true;
+							$('.uploader').removeClass('block-hide');
+							$('.start-zone').hide();
+						}
 
-						//render HTML for thumbnail item
-						$lstThumb.append(tmpl("tmpl-uploadThumbnail", {index: countUpload, filename: file.name, imageSrc: imageData, active: is1stFile}));
-						$('img[alt="' + file.name + '"]').resizeToParent();
+						uploadIndex++; debug(uploadIndex);
+
+						//render HTML for thumbnail item\
+						debug({index: uploadIndex, filename: file.name, imageSrc: imageData, active: is1stFile});
+						$lstThumb.append(tmpl("tmpl-uploadThumbnail", {index: uploadIndex, filename: file.name, imageSrc: imageData, active: is1stFile}));
+						$('img[alt="' + file.name + '"]').resizeToParent({parent: '.upload-thumbnail'});
 
 						//Extract EXIF data
 						// console.log(exifData);
-						var tdata = $.extend({}, exifData, {title: file.name, count: countUpload});
+						var tdata = $.extend({}, exifData, {title: file.name, count: uploadIndex});
 
 						//convert GPS data
 						if (tdata.GPSLatitude && tdata.GPSLongitude){
 							tdata = convertGPSdata(tdata);
-							$('.item.file_' + countUpload).append('<div class="ready"></div>');
+							$('.item.file_' + uploadIndex).append('<div class="ready"></div>');
 						}
 						
 						var nodeElement = tmpl("tmpl-uploadEditor", tdata);
-						data.context = countUpload;//KEY POINT, GRRRRRRRR !!!
-						$(".thumbnails-holder").append(nodeElement);
+						data.context = uploadIndex;//KEY POINT, GRRRRRRRR !!!
+						$(".edit-zone-holder").append(nodeElement);
 
 						if (is1stFile){
 							$('.preview-zone img').attr('src', imageData);
@@ -105,19 +110,21 @@ function setupUploader() {
 						updateUploadEditor();
 
 						//open Editor
-						if (countUpload == 0 || is1stFile){
+						if (uploadIndex == 0 || is1stFile){
 							$('.UploadDnD').hide();
 							$('.UploadEditor').show();
 							is1stFile = false;
 
-							initTaging(countUpload);
+							initTaging(uploadIndex);
 						}
+
+						//List files to upload
+						filesToUpload.push(data);
 					}
 				});
 			});
 			
-			//List files to upload
-			filesToUpload.push(data);
+			
 		},
 
 		send : function(e, data) {
@@ -590,3 +597,6 @@ function initTaging(nb){
 		}
 	});
 }*/
+function debug(data) {
+	console.log(data);
+}

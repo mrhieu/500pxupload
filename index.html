@@ -41,25 +41,14 @@
 		<div class="uploader block-hide">
 			<!-- Preview zone -->
 			<div class="container preview-zone">
-				<img src="img/demo.jpg" height="754"/>
+				<img src="img/mask-tran.png"/>
 			</div>
 
 			<!-- Thumbnail zone -->
 			<div class="container thumbnail-zone">
 				<div class="row">
 					<div class="col-md-9">
-						<ul class="thumbnails-holder nav nav-tabs" id="myTab">
-							<li class="active">
-								<a href="#photo-1" class="upload-thumbnail">
-									<img src="img/demo.jpg" width="64" height="64"/>
-								</a>
-							</li>
-							<li>
-								<a href="#photo-2" class="upload-thumbnail">
-									<img src="img/preview.png" width="64" height="64"/>
-								</a>
-							</li>
-						</ul>
+						<ul class="thumbnails-holder nav nav-tabs" id="myTab"></ul>
 					</div>
 
 					<div class="actions col-md-3 text-right">
@@ -72,21 +61,25 @@
 			</div>
 
 			<!-- Edit zone -->
-			<div class="container-fluid tab-content">
-				
-			</div>
+			<div class="container-fluid tab-content edit-zone-holder"></div>
+
 		</div>
 
 		<script type="text/x-tmpl" id="tmpl-uploadThumbnail">
-
+			<li class="{%=o.active?'active':'' %}">
+				<a href="#photo-{%=o.index %}" class="upload-thumbnail">
+					<img src="{%=o.imageSrc %}" width="64" height="64" alt="{%=o.filename %}"/>
+				</a>
+			</li>
 		</script>
+
 		<script type="text/x-tmpl" id="tmpl-uploadEditor">
-			<div class="container edit-zone tab-pane active" id="photo-1">
+			<div class="container edit-zone tab-pane active" id="photo-{%=o.count%}">
 				<form role="form">
 					<div class="row">
 						<div class="form-group col-md-8">
 							<label for="photo[title]" class="label-main">TITLE</label>
-							<input type="text" class="form-control photo-title instant-edit" id="photo[title]" placeholder="Untitled Image 1">
+							<input type="text" class="form-control photo-title instant-edit" id="photo[title]" placeholder="Untitled Image" value="{%=o.title.replace(/\.\w{3,4}$/gi, '')%}">
 						</div>
 					</div>
 					<div class="row">
@@ -95,7 +88,7 @@
 
 							<div class="row">
 								<label class="col-md-5 control-label">Camera</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][camera]" placeholder="Set Camera"/>
+								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][camera]" placeholder="Set Camera" value="{%=o.Model?o.Model:''%}"/>
 							</div>
 
 							<div class="row">
@@ -105,27 +98,45 @@
 
 							<div class="row">
 								<label class="col-md-5 control-label">Focal Length</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][focalLength]" placeholder="Set Focal Length"/>
+								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][focalLength]" placeholder="Set Focal Length" value="{%=o.FocalLength?(o.FocalLength + 'mm'):''%}"/>
 							</div>
 
 							<div class="row">
 								<label class="col-md-5 control-label">Shutter Speed</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][shutterspeed]" placeholder="Set Shutter Speed"/>
+								{% 
+                  var shutterSpeed = '';
+                  if (o.ExposureTime){
+                    if (o.ExposureTime < 1){
+                      shutterSpeed = '1/' + Math.round(1/o.ExposureTime);
+                    } else{
+                      shutterSpeed = o.ExposureTime;
+                    }
+                  } 
+                %}
+								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][shutterspeed]" placeholder="Set Shutter Speed" value="{%= shutterSpeed %}"/>
 							</div>
 
 							<div class="row">
 								<label class="col-md-5 control-label">Aperture</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][aperture]" placeholder="Set Aperture"/>
+								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][aperture]" placeholder="Set Aperture" value="{%=o.FNumber?('F' + o.FNumber):''%}"/>
 							</div>
 
 							<div class="row">
 								<label class="col-md-5 control-label">ISO</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][iso]" placeholder="Set ISO"/>
+								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][iso]" placeholder="Set ISO" value="{%=o.ISOSpeedRatings?o.ISOSpeedRatings:''%}"/>
 							</div>
 
 							<div class="row">
 								<label class="col-md-5 control-label">Taken</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][taken]" placeholder="Set Date (dd/mm/yy)"/>
+								{%
+		              if (o.DateTimeOriginal){
+		                var time = o.DateTimeOriginal;
+		                time = time.split(' ');
+		                odate = time[0].replace(/\:/gi, '-');
+		                otime = time[1].substring(0, 5);
+		              }
+		            %}
+								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][taken]" placeholder="Set Date (dd/mm/yy)" value="{%=o.DateTimeOriginal?odate:''%} {%=o.DateTimeOriginal?otime:''%}"/>
 							</div>
 
 							<div class="form-group">
@@ -198,9 +209,10 @@
 		<script src="js/app.js"></script>
 		<script>
 			$(function () {
-				$('#myTab a').click(function (e) {
-					e.preventDefault()
-					$(this).tab('show')
+				$(document).on('click', '#myTab a', function (e) {
+					e.preventDefault();
+					$(this).tab('show');
+					$('.preview-zone img').attr('src', $(this).find('img').attr('src'));
 				})
 			})
 		</script>
