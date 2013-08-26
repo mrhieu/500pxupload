@@ -36,8 +36,9 @@ textarea{resize: none}
   margin: 50px auto;
 }
 .preview-zone img{
-  max-width: 1140px;
-  max-height: 800px;
+  height: 740px;
+  display: block;
+  margin: 0 auto;
 }
 
 /* Thumbnail zone */
@@ -50,7 +51,18 @@ textarea{resize: none}
   height: 64px;
   width: 64px;
   overflow: hidden;
-  border-radius: none;
+  border-radius: 0!important;
+}
+.upload-thumbnail .glyphicon-ok-sign{
+  color: #5CB85C;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  background: #fff;
+  display: none;
+}
+.upload-thumbnail.ready .glyphicon-ok-sign{
+  display: block;
 }
 .thumbnails-holder .active{
   border-bottom: 2px solid #428bca;
@@ -84,8 +96,10 @@ textarea{resize: none}
   color: #428bca;
 }
 .photo-title{
-  font-size: 22px;
+  font-size: 26px;
   font-weight: bold;
+  margin-left: -5px;
+  padding-left: 5px
 }
 .instant-edit{
   border: none;
@@ -98,4 +112,17 @@ textarea{resize: none}
 }
 .exif{
   font-size: 12px;
+}
+.edit-zone .map-canvas{
+  width: 360px;
+  height: 240px;
+}
+.map {
+  position: relative;
+}
+.map-search{
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 300px;
 }

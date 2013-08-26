@@ -17,7 +17,7 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="#"><strong>500px uploader</strong></a>
+					<a class="navbar-brand" href="#"><strong>500px-like uploader</strong></a>
 				</div>
 				<div class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
@@ -35,7 +35,7 @@
 				<p>Drag photos from your computer in here. Select as many as you want.</p>
 				<div class="help-block">You can kill your browser with dropping 10 files in a row with 10MB each though (o.O)</div>
 				<p>You can also <a class="browse_files" href="#">browse</a> for photos to upload.</p>
-			<form id="fileupload" action="//jquery-file-upload.appspot.com/" method="POST" enctype="multipart/form-data">
+			</form>
 		</div>	
 
 		<div class="uploader block-hide">
@@ -52,10 +52,10 @@
 					</div>
 
 					<div class="actions col-md-3 text-right">
-						<button type="button" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i>remove</button>
-						<button type="button" class="btn btn-success"><i class="glyphicon glyphicon-floppy-disk"></i>save</button>
-						<button type="button" class="btn btn-primary"><i class="glyphicon glyphicon-open"></i>upload</button>
-						<p class="help-block">1/2 photos are ready</p>
+						<button type="button" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i> remove</button>
+						<button type="button" class="btn btn-success"><i class="glyphicon glyphicon-floppy-disk"></i> save</button>
+						<button type="button" class="btn btn-primary"><i class="glyphicon glyphicon-open"></i> upload</button>
+						<p class="help-block"><span class="readyphoto"></span>/<span class="totalphoto"></span> photos are ready</p>
 					</div>
 				</div>
 			</div>
@@ -67,19 +67,20 @@
 
 		<script type="text/x-tmpl" id="tmpl-uploadThumbnail">
 			<li class="{%=o.active?'active':'' %}">
-				<a href="#photo-{%=o.index %}" class="upload-thumbnail">
+				<a href="#photo-{%=o.index %}" class="upload-thumbnail {%= o.hasGPS?'ready':'' %}">
+					<i class="glyphicon glyphicon-ok-sign"></i>
 					<img src="{%=o.imageSrc %}" width="64" height="64" alt="{%=o.filename %}"/>
 				</a>
 			</li>
 		</script>
 
 		<script type="text/x-tmpl" id="tmpl-uploadEditor">
-			<div class="container edit-zone tab-pane active" id="photo-{%=o.count%}">
+			<div class="container edit-zone tab-pane {%= o.active?'active':''%}" id="photo-{%=o.count%}">
 				<form role="form">
 					<div class="row">
 						<div class="form-group col-md-8">
 							<label for="photo[title]" class="label-main">TITLE</label>
-							<input type="text" class="form-control photo-title instant-edit" id="photo[title]" placeholder="Untitled Image" value="{%=o.title.replace(/\.\w{3,4}$/gi, '')%}">
+							<input type="text" class="form-control photo-title instant-edit input-lg" id="photo[title]" placeholder="Untitled Image" value="{%=o.title.replace(/\.\w{3,4}$/gi, '')%}">
 						</div>
 					</div>
 					<div class="row">
@@ -182,10 +183,14 @@
 						</div>
 						<div class="col-md-4">
 							<label class="label-main">MAP</label>
-							<div class="map-canvas">
-								<img src="http://placehold.it/360x240&text=Googlemap"/>
-							</div>
-
+							<div class="map">
+								<div class="map-canvas">
+									<img src="http://placehold.it/360x240&text=Googlemap"/>
+								</div>
+								<input type="text" class="form-control map-search" placeholder="Search for location..."/>
+			          <input type="hidden" class="photoLat" name="photo[latitude]" value="{%=o.GPSLatitude?o.GPSLatitude:''%}"/>
+			          <input type="hidden" class="photoLon" name="photo[longitude]" value="{%=o.GPSLongitude?o.GPSLongitude:''%}"/>
+			         </div>
 						</div>
 
 					</div>
@@ -195,7 +200,7 @@
 
 		<script src="js/jquery-1.10.2.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
-		<script src="http://maps.google.com/maps/api/js?sensor=false&amp;libraries=visualization&amp;amp;language=en" type="text/javascript"></script>
+		<script src="http://maps.google.com/maps/api/js?sensor=false&libraries=places&language=en" type="text/javascript"></script>
 		<script src="js/fileupload/vendor/jquery.ui.widget.js"></script>
 		<script src="js/fileupload/jquery.fileupload.js"></script>
 		<script src="js/fileupload/jquery.fileupload-process.js"></script>

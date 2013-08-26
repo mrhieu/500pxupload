@@ -54,8 +54,8 @@ function setupUploader() {
 					quality: 90,
 					//rotate: 90,
 					callback: function(imageData, width, height, exifData) {
-						debug(exifData);
-						// Eliminate number of files (10)
+						// - NOT SUPPORT FILE - //
+						// Max of 10 files
 						if (filesToUpload.length >= 10) {
 							alert('Exceed max of 10 files. Aborted !');
 							return true;
@@ -73,58 +73,61 @@ function setupUploader() {
 							return false;
 						}
 
+						// - SUPPORTED FILE - //
+						uploadIndex++;// Index for each photo
 						var is1stFile = false;
 						if (filesToUpload.length == 0) {
 							is1stFile = true;
-							$('.uploader').removeClass('block-hide');
-							$('.start-zone').hide();
 						}
 
-						uploadIndex++; debug(uploadIndex);
-
-						//render HTML for thumbnail item\
-						debug({index: uploadIndex, filename: file.name, imageSrc: imageData, active: is1stFile});
-						$lstThumb.append(tmpl("tmpl-uploadThumbnail", {index: uploadIndex, filename: file.name, imageSrc: imageData, active: is1stFile}));
-						$('img[alt="' + file.name + '"]').resizeToParent({parent: '.upload-thumbnail'});
-
-						//Extract EXIF data
-						// console.log(exifData);
-						var tdata = $.extend({}, exifData, {title: file.name, count: uploadIndex});
-
-						//convert GPS data
+						// Extract EXIF data
+						var tdata = $.extend({}, exifData, {title: file.name, count: uploadIndex, active: is1stFile});
+						// convert GPS data if any
+						var hasGPS = false;
 						if (tdata.GPSLatitude && tdata.GPSLongitude){
 							tdata = convertGPSdata(tdata);
-							$('.item.file_' + uploadIndex).append('<div class="ready"></div>');
+							hasGPS = true;
 						}
-						
-						var nodeElement = tmpl("tmpl-uploadEditor", tdata);
+
+						// render HTML for thumbnail item
+						var thumbnailHtml = tmpl("tmpl-uploadThumbnail", {
+							index: uploadIndex, 
+							filename: file.name, 
+							imageSrc: imageData, 
+							active: is1stFile,
+							hasGPS: hasGPS
+						});
+						$lstThumb.append(thumbnailHtml);
+						$('img[alt="' + file.name + '"]').resizeToParent({parent: '.upload-thumbnail'});//auto resize and crop 1:1
+
+						// render HTML for edit-zone
+						var editZoneHtml = tmpl("tmpl-uploadEditor", tdata);
 						data.context = uploadIndex;//KEY POINT, GRRRRRRRR !!!
-						$(".edit-zone-holder").append(nodeElement);
+						$(".edit-zone-holder").append(editZoneHtml);
 
 						if (is1stFile){
+							$('.uploader').removeClass('block-hide');// show the edit tool
+							$('.start-zone').hide();
 							$('.preview-zone img').attr('src', imageData);
-							$("#pnEditorPhoto .editPhoto:eq(0)").show();
 							confirmClosePage();
-							window.setTimeout(function(){initMap($("#pnEditorPhoto .editPhoto:eq(0) .map_canvas")[0]);}, 0);
-						}
-						updateUploadEditor();
-
-						//open Editor
-						if (uploadIndex == 0 || is1stFile){
-							$('.UploadDnD').hide();
-							$('.UploadEditor').show();
-							is1stFile = false;
-
-							initTaging(uploadIndex);
+							window.setTimeout(function(){initMap($('#photo-' + uploadIndex + ' .map-canvas')[0]);}, 0);
 						}
 
-						//List files to upload
+						// open Editor
+						// if (uploadIndex == 0 || is1stFile){
+						// 	$('.UploadDnD').hide();
+						// 	$('.UploadEditor').show();
+						// 	is1stFile = false;
+
+						// 	initTaging(uploadIndex);
+						// }
+
+						//List of files to upload
 						filesToUpload.push(data);
+						updateUploadEditor();
 					}
 				});
 			});
-			
-			
 		},
 
 		send : function(e, data) {
@@ -165,10 +168,6 @@ function setupUploader() {
 		},
 
 		stop: function(e){
-			//3. When upload is finished and user is redirected to my_photospots => upload_complete
-			var duration = Math.round((new Date().getTime() - start)/100)/10;//in SECOND
-			_gaq.push(['_trackEvent', 'Photo_upload', 'upload_complete', '/photos/new', duration]);
-
 			redirectProgress('Finished.');
 			window.onbeforeunload = false;
 			window.setTimeout(function(){
@@ -237,27 +236,6 @@ function setupUploader() {
 		}
 	});
 
-	//Active YES/NO input
-	$(document).on('click', ".butTick", function(){
-		$(".butTick",$(this).parent()).removeClass("active");
-		$(this).addClass("active");
-		$(this).siblings('input').val(($(this).hasClass('butYes'))?1:0);
-	});
-
-	//Active easy - normal - hard
-	$(document).on('click', ".accessPhoto li", function(){
-		$("li",$(this).parent()).removeClass("active");
-		$(this).addClass("active");
-		$(this).parent().siblings('input').val($(this).parent().find('li').index($(this)) + 1);
-	});
-
-	//Editable input <-- gonna be deprecated
-	$(document).on('blur', ".txtHide", function(){
-		$(this).hide();
-		$(this).prev().text($(this).val()).show();
-		$(".up_edit", $(this).parents(".blockEdit")).show();
-	})
-
 	$('#photo_path').click(function() {
 		if (!isBrowserCompatible()) {
 			fancyAlert(I18n.t("upload.js_incompatible_msg"));
@@ -265,14 +243,8 @@ function setupUploader() {
 		}
 	});
 
-	
-
 	$('.btnUploadPic').on('click', function(e){
 		if (checkReady()){
-			// 2. During the photo processing phase => upload_progress
-			var duration = Math.round((new Date().getTime() - start)/100)/10;//in SECOND
-			_gaq.push(['_trackEvent', 'Photo_upload', 'upload_progress', '/photos/new', duration]);
-
 			$('.btnUploadPic').off('click').css({opacity: 0.5, cursor: 'wait'});
 			$('html, body').animate({scrollTop: 0}, 1000);
 			$('.btnRemove, .btnSave').hide();
@@ -347,21 +319,21 @@ function mapWarningOff(index){
 
 function initMap(element) {
 	var searchInput = $(element).parent().find('.map-search');
-	// var autocomplete = new google.maps.places.Autocomplete(searchInput[0]);
+	var autocomplete = new google.maps.places.Autocomplete(searchInput[0]);
 	var latInput = $(element).parent().find('.photoLat'),
-			lonInput = $(element).parent().find('.photoLon'),
-			tabIndex = $('.editPhoto').index($(element).closest('.editPhoto'));
+			lonInput = $(element).parent().find('.photoLon');
+			// tabIndex = $('.editPhoto').index($(element).closest('.editPhoto'));
 	var hasGPS = false;
 	if (latInput.val() && lonInput.val()) hasGPS = true;
 
-	var myLatLng = new google.maps.LatLng(40.714, -74.005);//New York, NY
+	var myLatLng = new google.maps.LatLng(21.03333, 105.85);//Hanoi, Vietnam
 	if (hasGPS){
 		myLatLng = new google.maps.LatLng(latInput.val(), lonInput.val());
 	}
-
+debug(myLatLng);
 	var myOptions = {
-		zoom : (hasGPS)?12:3,
-		center : myLatLng,
+		zoom: (hasGPS)?12:3,
+		center: myLatLng,
 		scaleControl: false,
 		mapTypeControl: false,
 		panControl: false,
@@ -371,11 +343,11 @@ function initMap(element) {
 		maxZoom: 20,
 		minZoom: 2
 	};
+	
 	map = new google.maps.Map(element, myOptions);
 
 	var marker = new google.maps.Marker({
 		position : myLatLng,
-		// map: map,
 		icon: spotIconImage,
 		shadow: spotIconShadow
 	});
@@ -393,19 +365,10 @@ function initMap(element) {
 
 		mapCenter = new google.maps.LatLng(lat, lon);
 
-
-
-		//add blue tick sign
-		var $thisItem = $('.item.active');
-		if ($thisItem.find('.ready').length == 0){
-			$thisItem.append('<div class="ready"></div>');
-		}
-
-		mapWarningOff(tabIndex);
+		// add Ready marker
+		$('thumbnails-holder .active .upload-thumbnail').addClass('active');
 
 		updateReadyPhoto();
-
-		//get Landmark list
 	});
 
 	autocomplete.bindTo('bounds', map);
@@ -428,55 +391,10 @@ function initMap(element) {
 	});
 }
 
-function openEditExif(obj) {
-	var objToProcess=$(obj).parent().next();
-	$(("span"),objToProcess).each(function(){
-		$(this).hide();
-		$(this).next().val($(this).text()).show();
-	})
-	$(obj).hide();
-}
-
-function openEditDatetime(obj) {
-	var objToProcess=$(obj).parent().next();
-	$(("span"),objToProcess).each(function(){
-		$(this).hide();
-		$(this).next().val($(this).text()).show().filter('.txtDate').datepicker({//datepicker
-			dateFormat: 'yy-mm-dd',
-			maxDate: new Date(),
-			onSelect: function(data){
-				$(this).siblings('span').text(data);
-				
-				//combine date time
-				var $datetime = $(this).closest('.blockEdit').next('.photoTakeon');
-				var date = data;
-				var $time = $(this).parent().next().find('.txtTimespan');//.text();
-				$time.text($time.text()?$time.text():'08:00');
-				// time = time?(time+':00'):'08:00:00';
-				$datetime.val(date + ' ' + $time.text());
-				$('.txtTime').val($time.text());
-			}
-		}).end().filter('.txtTime').timepicker({//timepicker
-			timeFormat: 'H:i',
-			step: 15
-		}).on('changeTime', function() {
-			$(this).siblings('span').text($(this).val());
-
-			//combine datetime
-			var $datetime = $(this).closest('.blockEdit').next('.photoTakeon');
-			var $date = $(this).parent().prev().find('.txtDatespan');//.text();
-			$date.text($date.text()?$date.text():(dateFormat(new Date(), "YYYY/MM/DD")));
-			var time = $(this).val() + ':00';
-			$datetime.val($date.text() + ' ' + time);
-			$('.txtDate').val($date.text());
-		});
-	})
-	$(obj).hide();
-}
-
 function confirmClosePage(){
+	return true;
 	window.onbeforeunload = function(e){
-		var msg = I18n.t('upload.js_confirm_leave');
+		var msg = 'Are you sure to leave this page ?';
 		e = e || window.event;
 		if(e) e.returnValue = msg;
 		return msg;
@@ -484,22 +402,12 @@ function confirmClosePage(){
 }
 
 function updateUploadEditor(){
-	$('.totalphoto').text($('.lstThumb .item').length);
+	$('.totalphoto').text(filesToUpload.length);
 	updateReadyPhoto();
-
-	//Save btn for last tab
-	$('#pnEditorPhoto .editPhoto .btnSave').text('Save and continue');
-	$('#pnEditorPhoto .editPhoto').last().find('.btnSave').text('Save');
 }
+
 function updateReadyPhoto(){
-	$('.readyphoto').text($('.lstThumb .item .ready').length);
-	if ($('.readyphoto').text() == $('.totalphoto').text()){
-		$('.btnUploadPic').fadeIn();
-		$('.warn-upload').hide();
-	} else{
-		$('.btnUploadPic').hide();
-		$('.warn-upload').show();
-	}
+	$('.readyphoto').text($('.upload-thumbnail.ready').length);
 }
 
 function convertGPSdata(data){
@@ -516,11 +424,11 @@ function minuteToDegree(data){
 }
 
 function dateFormat(date, format) {
-		// Calculate date parts and replace instances in format string accordingly
-		format = format.replace("DD", (date.getDate() < 10 ? '0' : '') + date.getDate()); // Pad with '0' if needed
-		format = format.replace("MM", (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1)); // Months are zero-based
-		format = format.replace("YYYY", date.getFullYear());
-		return format;
+	// Calculate date parts and replace instances in format string accordingly
+	format = format.replace("DD", (date.getDate() < 10 ? '0' : '') + date.getDate()); // Pad with '0' if needed
+	format = format.replace("MM", (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1)); // Months are zero-based
+	format = format.replace("YYYY", date.getFullYear());
+	return format;
 }
 
 function checkReady(){
