@@ -1,8 +1,6 @@
-var destinationAfterUpload = '/my_photos';
-var filesToUpload = new Array();
+var destinationAfterUpload = 'uploaded.html';
+var filesToUpload = [];
 var map;
-var mapCenter;
-var id = null;
 
 // Init Googlemap marker image
 var spotIconImage = new google.maps.MarkerImage("img/marker_r1_c4.png",
@@ -56,7 +54,7 @@ function setupUploader() {
 					callback: function(imageData, width, height, exifData) {
 						// - NOT SUPPORT FILE - //
 						// Max of 10 files
-						if (filesToUpload.length >= 10) {
+						if ($('.upload-thumbnail').length >= 10) {
 							alert('Exceed max of 10 files. Aborted !');
 							return true;
 						}
@@ -76,8 +74,9 @@ function setupUploader() {
 						// - SUPPORTED FILE - //
 						uploadIndex++;// Index for each photo
 						var is1stFile = false;
-						if (filesToUpload.length == 0) {
+						if ($('.upload-thumbnail').length == 0) {
 							is1stFile = true;
+							uploadIndex = 1;
 						}
 
 						// Extract EXIF data
@@ -110,19 +109,12 @@ function setupUploader() {
 							$('.start-zone').hide();
 							$('.preview-zone img').attr('src', imageData);
 							confirmClosePage();
-							window.setTimeout(function(){initMap($('#photo-' + uploadIndex + ' .map-canvas')[0]);}, 0);
+							initMap($('#photo-' + uploadIndex + ' .map-canvas')[0]);
 						}
 
-						// open Editor
-						// if (uploadIndex == 0 || is1stFile){
-						// 	$('.UploadDnD').hide();
-						// 	$('.UploadEditor').show();
-						// 	is1stFile = false;
+						// initTaging(uploadIndex);
 
-						// 	initTaging(uploadIndex);
-						// }
-
-						//List of files to upload
+						// List of files to upload
 						filesToUpload.push(data);
 						updateUploadEditor();
 					}
@@ -147,8 +139,9 @@ function setupUploader() {
 		},
 
 		submit: function(e, data){
-			if ($('.editPhoto.file_' + data.context + ' form.addition-data').length != 0){//dont send removed photos
-				var additionData = $('.editPhoto.file_' + data.context + ' form.addition-data').serializeArray();
+			console.log(data.files[0].name + '<-- uploading...');
+			if ($('#photo-' + data.context).length != 0) {//dont send removed photos
+				var additionData = $('#photo-' + data.context + ' form').serializeArray();
 				data.formData = additionData;
 				return true;
 			} else {
@@ -157,12 +150,13 @@ function setupUploader() {
 		},
 
 		done : function(e, data) {
-			console.log('DONE: ' + data.files[0].name);
+			debug(data.result);
+			console.log(data.files[0].name + '<-- DONE');
 			
 			//Store image data into HTML5 sessionStorage to display right after uploading
 			if (window.sessionStorage){
-				var photoId = data.result;
-				var imageData = $('.lstThumb .item.file_' + data.context + ' .img img').attr('src');
+				var photoId = new Date().getTime(); //data.result;
+				var imageData = $('.upload-thumbnail.photo_' + data.context + ' img').attr('src');
 				sessionStorage.setItem('photo_' + photoId, imageData);
 			}
 		},
@@ -174,58 +168,37 @@ function setupUploader() {
 				redirectProgress('Redirecting...');
 			}, 1000);
 			window.setTimeout(function(){
-				window.location.href = destinationAfterUpload;
+				// window.location.href = destinationAfterUpload;
 			}, 2000);
 		}
 	});
 	
 	/*-- Binding events --*/
-
-	//click thumbnail to select Editor tab
-	$(document).on('click', '.lstThumb .item:not(".active")', function(){
-		tabSelect($('.lstThumb .item').index($(this)));
-	})
-
 	//Cancel (remove) a photo
-	$(document).on('click', '.btnRemove', function(){
-		var $_this = $(this);
-		var $_editPhoto = $_this.closest('.editPhoto');
-		var index = $('#pnEditorPhoto .editPhoto').index($_editPhoto);
-
-		//remove photo thumbnail + editor
-		var r = confirm(I18n.t('upload.js_confirm_remove'));
+	$(document).on('click', '.btn-remove', function(e){
+		var r = confirm('Are you sure to remove this photo');
 		if (r == true) {
-			$('.lstThumb .item').eq(index).remove();
-			$_editPhoto.remove();
-
-			//Show Add more button
-			if ($('.lstThumb .item').length == 9){
-				$('.uploadOther').show();
-			}
-
-			//If no photo remains, reset drop-area
-			if ($('.lstThumb .item').length == 0){
-				$('.UploadDnD').show();
-				$('.UploadEditor').hide();
-				is1stFile = true;
-			}
-
-			//update new thumnail + editor
-			index = (index==0)?0:(index - 1);
-			$('.lstThumb .item').eq(index).addClass('active');
-			$('#pnEditorPhoto .editPhoto').eq(index).show();
-			var newThumbSrc = $('.lstThumb .item').eq(index).find('.img img').attr('src');
-			newThumbSrc = (newThumbSrc)?newThumbSrc:'/images/newui/back_prup.png';
-			$('.mainImg img.mainImg').attr('src', newThumbSrc);
-			if ($('.editPhoto').eq(index).find('.map_canvas').length){
-				initMap($('.editPhoto').eq(index).find('.map_canvas')[0]);
+			// remove photo thumbnail + editor
+			$('.edit-zone.active').remove();
+			if ($('.thumbnails-holder .active').prev().length) {
+				$('.thumbnails-holder .active').prev().find('a').trigger('click').end().end().remove();
+			} else {
+				$('.thumbnails-holder .active').next().find('a').trigger('click').end().end().remove();
 			}
 			updateUploadEditor();
+
+			// If no photo remains, reset start-zone
+			if ($('.upload-thumbnail').length == 0){
+				$('.start-zone').show();
+				$('.uploader').addClass('block-hide');
+				is1stFile = true;
+				filesToUpload = [];
+			}
 		}
 	});
 
 	//Save and next a photo
-	$(document).on('click', '.btnSave', function(){
+	/*$(document).on('click', '.btnSave', function(){
 		var $parentTab = $(this).closest('.editPhoto');
 
 		if ($parentTab.find('.photoLat').val() && $parentTab.find('.photoLon').val()){
@@ -234,56 +207,44 @@ function setupUploader() {
 		} else{
 			mapWarningOn($('.editPhoto').index($parentTab));
 		}
-	});
+	});*/
 
-	$('#photo_path').click(function() {
-		if (!isBrowserCompatible()) {
-			fancyAlert(I18n.t("upload.js_incompatible_msg"));
-			return false;
+	$('.btn-upload').on('click', function(e){
+		$('.btn-upload').off('click').css({opacity: 0.5, cursor: 'wait'});
+		$('html, body').animate({scrollTop: 0}, 1000);
+		$('.btn-remove, .btn-save').hide();
+		$('.preview-zone img').remove();
+
+		$(document).off('click', '#myTab a');
+		$('.upload-thumbnail').parent().removeClass('active');
+		// $('.edit-zone').removeClass('active');
+		$('.map').addClass('disabled');
+		$('.edit-zone input, .edit-zone textarea, .edit-zone select').attr('readonly', 'true');
+
+		for (i in filesToUpload){
+			filesToUpload[i].submit();
 		}
 	});
 
-	$('.btnUploadPic').on('click', function(e){
-		if (checkReady()){
-			$('.btnUploadPic').off('click').css({opacity: 0.5, cursor: 'wait'});
-			$('html, body').animate({scrollTop: 0}, 1000);
-			$('.btnRemove, .btnSave').hide();
-			$('.mainImg img').remove();
-			$(document).off('click', '.lstThumb .item:not(".active")');
-			$('.lstThumb .item').removeClass('active');
-			$('.btnBrowse').remove();
-			// $('#pnEditorPhoto').hide();
-			$('.map').addClass('disabled');
-			$('.editPhoto input, .editPhoto textarea').attr('readonly', 'true');
-			for (i in filesToUpload){
-				filesToUpload[i].submit();
-			}
-		}
-	});
+	// $('.btnUploadCancel').on('click', function(e){
+	// 	console.log(jqXHR);
+	// 	showProgress(0);
+	// 	jqXHR.abort();
+	// });
 
-	$('.btnUploadCancel').on('click', function(e){
-		console.log(jqXHR);
-		showProgress(0);
-		jqXHR.abort();
-	});
-
-	$(document).on('click', '.moretips-trg', function(){
+	/*$(document).on('click', '.moretips-trg', function(){
 		$('.moretips').slideToggle();
 		$(this).find('.icon-slide-toggle').toggleClass('up');
-	});
+	});*/
 }
 
-function tabSelect(index){
-	$('.lstThumb .item').removeClass('active');
-	$('.item').eq(index).addClass('active');
-	$('#pnEditorPhoto .editPhoto').hide();
-	$('.editPhoto').eq(index).show();
-	$('.mainImg img.mainImg').attr('src', $('.item').eq(index).find('img').attr('src'));
-	initMap($('.editPhoto').eq(index).find('.map_canvas')[0]);
-	initTaging($('.item').eq(index).data('fid'));
+function tabSelect(_this){
+	$('.preview-zone img').attr('src', _this.find('img').attr('src'));
+	initMap($('.edit-zone.active .map-canvas')[0]);
+	// initTaging($('.item').eq(index).data('fid'));
 }
 
-function moveTabSelect(direction){
+/*function moveTabSelect(direction){
 	if (direction == undefined) direction = 'next';
 	var index = $('.lstThumb .item').index($('.item.active'));
 	var nbTab = $('.lstThumb .item').length;
@@ -304,25 +265,14 @@ function moveTabSelect(direction){
 	$('.mainImg img.mainImg').attr('src', $('.lstThumb .item').eq(index).find('img').attr('src'));
 
 	initTaging($('.item').eq(index).data('fid'));
-}
-
-//Validation Indicator for Map
-function mapWarningOn(index){
-	$('.editPhoto').eq(index).find('.pnMessageIn').addClass('show')
-		.end().find('.map-warn').addClass('show');
-}
-
-function mapWarningOff(index){
-	$('.editPhoto').eq(index).find('.pnMessageIn').removeClass('show')
-		.end().find('.map-warn').removeClass('show');
-}
+}*/
 
 function initMap(element) {
-	var searchInput = $(element).parent().find('.map-search');
+	var $_element = $(element);
+	var searchInput = $_element.parent().find('.map-search');
 	var autocomplete = new google.maps.places.Autocomplete(searchInput[0]);
-	var latInput = $(element).parent().find('.photoLat'),
-			lonInput = $(element).parent().find('.photoLon');
-			// tabIndex = $('.editPhoto').index($(element).closest('.editPhoto'));
+	var latInput = $_element.parent().find('.photoLat'),
+			lonInput = $_element.parent().find('.photoLon');
 	var hasGPS = false;
 	if (latInput.val() && lonInput.val()) hasGPS = true;
 
@@ -330,7 +280,6 @@ function initMap(element) {
 	if (hasGPS){
 		myLatLng = new google.maps.LatLng(latInput.val(), lonInput.val());
 	}
-debug(myLatLng);
 	var myOptions = {
 		zoom: (hasGPS)?12:3,
 		center: myLatLng,
@@ -363,10 +312,8 @@ debug(myLatLng);
 		latInput.val(lat);
 		lonInput.val(lon);
 
-		mapCenter = new google.maps.LatLng(lat, lon);
-
 		// add Ready marker
-		$('thumbnails-holder .active .upload-thumbnail').addClass('active');
+		$('.thumbnails-holder .active .upload-thumbnail').addClass('ready');
 
 		updateReadyPhoto();
 	});
@@ -375,7 +322,6 @@ debug(myLatLng);
 
 	google.maps.event.addListener(autocomplete, 'place_changed', function() {
 		var place = autocomplete.getPlace();
-		// console.log(place);
 		if (!place.geometry) {
 			// Inform the user that the place was not found and return.
 			return;
@@ -402,7 +348,7 @@ function confirmClosePage(){
 }
 
 function updateUploadEditor(){
-	$('.totalphoto').text(filesToUpload.length);
+	$('.totalphoto').text($('.upload-thumbnail').length);
 	updateReadyPhoto();
 }
 
