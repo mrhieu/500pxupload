@@ -3,6 +3,8 @@
 	<head>
 		<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
 		<link href="css/select2.css" rel="stylesheet" type="text/css">
+		<link href="css/datepicker.css" rel="stylesheet" type="text/css">
+		<link href="css/jquery.timepicker.css" rel="stylesheet" type="text/css">
 		<link href="css/app.css" rel="stylesheet" type="text/css">
 		
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -34,7 +36,7 @@
 			<form id="fileupload" action="server/php/index.php" method="POST" enctype="multipart/form-data">
 				<input type="file" id="input-browse" class="block-hide" multiple="multiple" name="photo[image]">
 				<p>Drag photos from your computer in here. Select as many as you want.</p>
-				<div class="help-block">You can kill your browser with dropping 10 files in a row with 10MB each though (o.O)</div>
+				<div class="help-block">Anyway, you can kill your browser with dropping 10 files in a row with 10MB each (o.O)</div>
 				<p>You can also <a class="browse_files" href="#">browse</a> for photos to upload.</p>
 			</form>
 		</div>	
@@ -81,7 +83,7 @@
 					<div class="row">
 						<div class="form-group col-md-8">
 							<label for="photo[title]" class="label-main">TITLE</label>
-							<input type="text" class="form-control photo-title instant-edit input-lg" id="photo[title]" placeholder="Untitled Image" value="{%=o.title.replace(/\.\w{3,4}$/gi, '')%}">
+							<input type="text" class="form-control photo-title instant-edit input-lg" name="photo[title]" placeholder="Untitled Image" value="{%=o.title.replace(/\.\w{3,4}$/gi, '')%}">
 						</div>
 					</div>
 					<div class="row">
@@ -90,17 +92,17 @@
 
 							<div class="row">
 								<label class="col-md-5 control-label">Camera</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][camera]" placeholder="Set Camera" value="{%=o.Model?o.Model:''%}"/>
+								<input type="text" class="col-md-7 input-sm instant-edit" name="photo[exif][camera]" placeholder="Set Camera" value="{%=o.Model?o.Model:''%}"/>
 							</div>
 
 							<div class="row">
 								<label class="col-md-5 control-label">Lens</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][lens]" placeholder="Set Lens"/>
+								<input type="text" class="col-md-7 input-sm instant-edit" name="photo[exif][lens]" placeholder="Set Lens"/>
 							</div>
 
 							<div class="row">
 								<label class="col-md-5 control-label">Focal Length</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][focalLength]" placeholder="Set Focal Length" value="{%=o.FocalLength?(o.FocalLength + 'mm'):''%}"/>
+								<input type="text" class="col-md-7 input-sm instant-edit" name="photo[exif][focalLength]" placeholder="Set Focal Length" value="{%=o.FocalLength?(o.FocalLength + 'mm'):''%}"/>
 							</div>
 
 							<div class="row">
@@ -115,30 +117,36 @@
                     }
                   } 
                 %}
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][shutterspeed]" placeholder="Set Shutter Speed" value="{%= shutterSpeed %}"/>
+								<input type="text" class="col-md-7 input-sm instant-edit" name="photo[exif][shutterspeed]" placeholder="Set Shutter Speed" value="{%= shutterSpeed %}"/>
 							</div>
 
 							<div class="row">
 								<label class="col-md-5 control-label">Aperture</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][aperture]" placeholder="Set Aperture" value="{%=o.FNumber?('F' + o.FNumber):''%}"/>
+								<input type="text" class="col-md-7 input-sm instant-edit" name="photo[exif][aperture]" placeholder="Set Aperture" value="{%=o.FNumber?('F' + o.FNumber):''%}"/>
 							</div>
 
 							<div class="row">
 								<label class="col-md-5 control-label">ISO</label>
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][iso]" placeholder="Set ISO" value="{%=o.ISOSpeedRatings?o.ISOSpeedRatings:''%}"/>
+								<input type="text" class="col-md-7 input-sm instant-edit" name="photo[exif][iso]" placeholder="Set ISO" value="{%=o.ISOSpeedRatings?o.ISOSpeedRatings:''%}"/>
 							</div>
 
 							<div class="row">
 								<label class="col-md-5 control-label">Taken</label>
 								{%
-		              if (o.DateTimeOriginal){
-		                var time = o.DateTimeOriginal;
+									var dateTimeOriginal = o.DateTimeOriginal || o.DateTime || '';
+		              if (dateTimeOriginal){
+		                var time = dateTimeOriginal;
 		                time = time.split(' ');
-		                odate = time[0].replace(/\:/gi, '-');
+		                odate = time[0].replace(/\:/gi, '/');
 		                otime = time[1].substring(0, 5);
+		                dateTimeOriginal = odate + ' ' + otime;
 		              }
 		            %}
-								<input type="text" class="col-md-7 input-sm instant-edit" id="photo[exif][taken]" placeholder="Set Date (dd/mm/yy)" value="{%=o.DateTimeOriginal?odate:''%} {%=o.DateTimeOriginal?otime:''%}"/>
+		            
+		            <div class="col-md-1"><i class="glyphicon glyphicon-calendar"></i></div>
+								<input type="text" class="col-md-3 input-sm instant-edit datepicker" name="photo[exif][taken][0]" placeholder="Set Date" value="{%=dateTimeOriginal?odate:''%}" readonly="true"/>
+								<div class="col-md-1"><i class="glyphicon glyphicon-time"></i></div>
+								<input type="text" class="col-md-2 input-sm instant-edit timepicker" name="photo[exif][taken][1]" placeholder="Set Time" value="{%=dateTimeOriginal?otime:''%}"/>
 							</div>
 
 							<div class="form-group">
@@ -178,7 +186,7 @@
 
 							<div class="form-group">
 								<label class="label-main">TAGS</label>
-								<input type="text" class="form-control" id="photo[tags]" placeholder="Tag to make your photo easier to find..."/>
+								<input type="text" class="form-control tagging" name="photo[tags]" placeholder="Tag to make your photo easier to find..."/>
 							</div>
 
 						</div>
@@ -193,7 +201,6 @@
 			          <input type="hidden" class="photoLon" name="photo[longitude]" value="{%=o.GPSLongitude?o.GPSLongitude:''%}"/>
 			         </div>
 						</div>
-
 					</div>
 				</form>
 			</div>
@@ -212,6 +219,8 @@
 		<script src="js/tmpl.min.js"></script>
 		<script src="js/jquery.resizeimagetoparent.min.js"></script>
 		<script src="js/select2.min.js"></script>
+		<script src="js/bootstrap-datepicker.js"></script>
+		<script src="js/jquery.timepicker.js"></script>
 		<script src="js/app.js"></script>
 		<script>
 			$(function () {
@@ -224,6 +233,6 @@
 				})
 			})
 		</script>
-		<!--script src="js/live.js"></script-->
+		<script src="js/live.js"></script>
 	</body>
 </html>

@@ -24,7 +24,6 @@ $(function () {
 })
 
 function setupUploader() {
-	// foursquareHelper.initialize(window.foursquareClientId, window.foursquareSecret);
 	var jqXHR, uploadIndex = 0;
 
 	$('#fileupload').fileupload({
@@ -47,7 +46,7 @@ function setupUploader() {
 			$.each(data.files, function(index, file) {
 				canvasResize(file, {
 					width: 1140,
-					height: 0,
+					height: 500,
 					crop: false,
 					quality: 90,
 					//rotate: 90,
@@ -112,7 +111,7 @@ function setupUploader() {
 							initMap($('#photo-' + uploadIndex + ' .map-canvas')[0]);
 						}
 
-						// initTaging(uploadIndex);
+						initFormHelper();
 
 						// List of files to upload
 						filesToUpload.push(data);
@@ -150,7 +149,7 @@ function setupUploader() {
 		},
 
 		done : function(e, data) {
-			debug(data.result);
+			console.log(data.result);
 			console.log(data.files[0].name + '<-- DONE');
 			
 			//Store image data into HTML5 sessionStorage to display right after uploading
@@ -197,18 +196,6 @@ function setupUploader() {
 		}
 	});
 
-	//Save and next a photo
-	/*$(document).on('click', '.btnSave', function(){
-		var $parentTab = $(this).closest('.editPhoto');
-
-		if ($parentTab.find('.photoLat').val() && $parentTab.find('.photoLon').val()){
-			moveTabSelect('next');
-			mapWarningOff($('.editPhoto').index($parentTab));
-		} else{
-			mapWarningOn($('.editPhoto').index($parentTab));
-		}
-	});*/
-
 	$('.btn-upload').on('click', function(e){
 		$('.btn-upload').off('click').css({opacity: 0.5, cursor: 'wait'});
 		$('html, body').animate({scrollTop: 0}, 1000);
@@ -221,51 +208,21 @@ function setupUploader() {
 		$('.map').addClass('disabled');
 		$('.edit-zone input, .edit-zone textarea, .edit-zone select').attr('readonly', 'true');
 
+		if (window.sessionStorage){
+			sessionStorage.clear();
+		}
+
 		for (i in filesToUpload){
 			filesToUpload[i].submit();
 		}
 	});
-
-	// $('.btnUploadCancel').on('click', function(e){
-	// 	console.log(jqXHR);
-	// 	showProgress(0);
-	// 	jqXHR.abort();
-	// });
-
-	/*$(document).on('click', '.moretips-trg', function(){
-		$('.moretips').slideToggle();
-		$(this).find('.icon-slide-toggle').toggleClass('up');
-	});*/
 }
 
 function tabSelect(_this){
 	$('.preview-zone img').attr('src', _this.find('img').attr('src'));
 	initMap($('.edit-zone.active .map-canvas')[0]);
-	// initTaging($('.item').eq(index).data('fid'));
+	initFormHelper();
 }
-
-/*function moveTabSelect(direction){
-	if (direction == undefined) direction = 'next';
-	var index = $('.lstThumb .item').index($('.item.active'));
-	var nbTab = $('.lstThumb .item').length;
-	if (direction == 'next'){
-		index = (index>=(nbTab-1))?(nbTab-1):(index + 1);
-	}else if (direction == 'prev'){
-		index = (index==0)?0:(index - 1);
-	}
-	$('.lstThumb .item').removeClass('active');
-	$('.lstThumb .item').eq(index).addClass('active');
-	$('.editPhoto').hide();
-	$('.editPhoto').eq(index).show();
-
-	//update map
-	initMap($('.editPhoto').eq(index).find('.map_canvas')[0]);
-
-	//update big thumbnail
-	$('.mainImg img.mainImg').attr('src', $('.lstThumb .item').eq(index).find('img').attr('src'));
-
-	initTaging($('.item').eq(index).data('fid'));
-}*/
 
 function initMap(element) {
 	var $_element = $(element);
@@ -426,31 +383,23 @@ $.fn.animateHighlight = function(highlightColor, duration) {
 		this.stop().css("background-color", highlightBg).animate({backgroundColor: originalBg}, animateMs);
 };
 
-function initTaging(nb){
-	$('.editPhoto.file_' + nb + ' .taging').select2({
-			minimumInputLength: 3,
-			maximumSelectionSize: 3,
-			placeholder: $('input.taging').attr('placeholder'),
-			tags: ["red", "green", "blue"],
-			tokenSeparators: [","],
-			width: '410px'
+function initFormHelper(){
+	$('.edit-zone.active .tagging').select2({
+		minimumInputLength: 3,
+		maximumSelectionSize: 3,
+		placeholder: $(this).attr('placeholder'),
+		tags: [],
+		tokenSeparators: [","],
+		width: '360px'
 	});
-}
-/*function spotsF4q(){
-	//Foursquare API
-	foursquareHelper.explore(tdata.GPSLatitude, tdata.GPSLongitude, function(data) {
-		if (data.response.groups) {
-			for (i in data.response.groups ) {
-				var group = data.response.groups[i];
-				for (j in group.items ) {
-					var item = group.items[j];
-					option.text(item.venue.name);
-					option.val(item.venue.name + ',' + item.venue.location["lat"] + ',' + item.venue.location["lng"] + ',' + item.venue.location["city"] + ',' + item.venue.location["country"] + ',' + item.venue.location["state"] + ',' + item.venue.id);
-				}
-			}
-		}
+
+	$('.edit-zone.active .datepicker').datepicker({
+		format: "yyyy/mm/dd",
+		autoclose: true
 	});
-}*/
-function debug(data) {
-	console.log(data);
+
+	$('.edit-zone.active .timepicker').timepicker({
+		timeFormat: 'H:i',
+		step: 1
+	}).on('keypress', function(e){e.preventDefault()});
 }
