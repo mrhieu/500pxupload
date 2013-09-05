@@ -32,6 +32,7 @@
 		<!-- Photo list -->
 		<div class="container">
 			<div class="row photoList">
+				<h2>No uploaded photos</h2>
 			</div>
 		</div>
 		
@@ -39,9 +40,9 @@
 			<div class="col-md-3 item">
 				<div class="panel panel-default">
 				  <div class="panel-body">
-				    <img class="img-rounded" src="http://placehold.it/231x{%=o.height%}&text=Photo"/>
+				    <img class="img-rounded" src="{%= o.imageData %}" width="231"/>
 				  </div>
-				  <div class="panel-footer">Panel footer</div>
+				  <div class="panel-footer">{%= o.filename%}</div>
 				</div>
 			</div>
 		</script>
@@ -52,13 +53,17 @@
 		<script src="js/jquery.resizeimagetoparent.min.js"></script>
 		<script src="js/masonry.min.js"></script>
 		<script>
-			duplicatePhoto = function() {
-				for (var i = 1; i < 30; i++){
-					$('.photoList').append(tmpl("tmpl-photoItem", {height: parseInt(101 + Math.random()*100) }));
+			if (window.sessionStorage){
+				var photos = window.sessionStorage;
+				var html = '';
+				for (var i in photos) {
+				  if (photos.hasOwnProperty(i)) {
+				    html += tmpl("tmpl-photoItem", {filename: i, imageData: photos[i]});
+				  }
 				}
-
+				$('.photoList').empty().append(html);
 				setTimeout(function(){$('.photoList').masonry();}, 500);
-			}();
+			}
 		</script>
 		<script src="js/live.js"></script>
 	</body>

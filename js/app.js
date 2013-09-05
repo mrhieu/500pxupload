@@ -36,7 +36,7 @@ function setupUploader() {
 		// singleFileUploads: false,//if TRUE (default), "add" will be call multiple times
 		sequentialUploads: true,
 		maxNumberOfFiles: 10,
-		disableImageResize: false,
+		disableImageResize: true,
 		imageMaxWidth: 1600,
 		imageMaxHeight: 1600,
 		uploadTemplateId: null,
@@ -151,14 +151,12 @@ function setupUploader() {
 		},
 
 		done : function(e, data) {
-			console.log(data.result);
 			console.log(data.files[0].name + '<-- DONE');
 			
 			//Store image data into HTML5 sessionStorage to display right after uploading
 			if (window.sessionStorage){
-				var photoId = new Date().getTime(); //data.result;
 				var imageData = $('.upload-thumbnail.photo_' + data.context + ' img').attr('src');
-				sessionStorage.setItem('photo_' + photoId, imageData);
+				sessionStorage.setItem('photo_' + data.files[0].name.substring(0, 20), imageData);
 			}
 		},
 
@@ -169,7 +167,7 @@ function setupUploader() {
 				redirectProgress('Redirecting...');
 			}, 1000);
 			window.setTimeout(function(){
-				// window.location.href = destinationAfterUpload;
+				window.location.href = destinationAfterUpload;
 			}, 2000);
 		}
 	});
@@ -203,16 +201,16 @@ function setupUploader() {
 		$('html, body').animate({scrollTop: 0}, 1000);
 		$('.btn-remove, .btn-save').hide();
 		$('.preview-zone img').remove();
-
-		$(document).off('click', '#myTab a');
+		$(document).on('click', '#myTab a', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+		});
 		$('.upload-thumbnail').parent().removeClass('active');
 		// $('.edit-zone').removeClass('active');
 		$('.map').addClass('disabled');
 		$('.edit-zone input, .edit-zone textarea, .edit-zone select').attr('readonly', 'true');
 
-		if (window.sessionStorage){
-			sessionStorage.clear();
-		}
+		
 
 		for (i in filesToUpload){
 			filesToUpload[i].submit();
@@ -297,7 +295,6 @@ function initMap(element) {
 }
 
 function confirmClosePage(){
-	return true;
 	window.onbeforeunload = function(e){
 		var msg = 'Are you sure to leave this page ?';
 		e = e || window.event;
@@ -352,7 +349,7 @@ function checkReady(){
 function showProgress(rate){
 	var $p = $('.progress-holder');
 	if (!$p.is(':visible')) $p.show();
-	$p.find('.progress .bar').css('width', rate + '%');
+	$p.find('.progress-bar').css('width', rate + '%');
 	$p.find('.progress-rate').text(rate + '%');
 }
 
@@ -379,13 +376,6 @@ function checkBrowserCompatible(){
 	}
 }
 
-$.fn.animateHighlight = function(highlightColor, duration) {
-		var highlightBg = highlightColor || "#a4efff";
-		var animateMs = duration || 1500;
-		var originalBg = 'transparent';//this.css("backgroundColor");
-		this.stop().css("background-color", highlightBg).animate({backgroundColor: originalBg}, animateMs);
-};
-
 function initFormHelper(){
 	$('.edit-zone.active .tagging').select2({
 		minimumInputLength: 3,
@@ -405,4 +395,10 @@ function initFormHelper(){
 		timeFormat: 'H:i',
 		step: 1
 	}).on('keypress', function(e){e.preventDefault()});
+}
+
+function clearClientStorage() {
+	if (window.sessionStorage){
+		sessionStorage.clear();
+	}
 }
