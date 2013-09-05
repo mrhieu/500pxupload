@@ -15,6 +15,8 @@ var spotIconShadow = new google.maps.MarkerImage("img/marker_r1_c4_shadow.png",
 );
 
 $(function () {
+	"user strict";
+	checkBrowserCompatible();
 	$('.browse_files').on('click', function() {
 		$('#input-browse').focus().click();
 		return false;
@@ -372,7 +374,8 @@ function isBrowserCompatible(){
 
 function checkBrowserCompatible(){
 	if (!isBrowserCompatible()){
-		fancyAlert("Please use latest Google Chrome, Mozilla Firefox, Opera to get the best experiences");
+		// fancyAlert("Please use latest Google Chrome, Mozilla Firefox, Opera to get the best experiences");
+		alert('Unsupported browser !');
 	}
 }
 

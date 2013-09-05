@@ -130,11 +130,11 @@ textarea[name="photo[description]"] {
 
 /* custom style for Select2 */
 .select2-choices {
-  background: none !important;
-  border: none !important;
-  box-shadow: none!important;
-  width: 340px;
-  margin: -3px 0 0 -10px!important;
+	background: none !important;
+	border: none !important;
+	box-shadow: none!important;
+	width: 340px;
+	margin: -3px 0 0 -10px!important;
 }
 .select2-drop-active{
 	border: none; 
@@ -151,6 +151,7 @@ textarea[name="photo[description]"] {
 	background: #478BCA;
 }
 
+/* Map */
 .map {
 	position: relative;
 }
@@ -169,3 +170,19 @@ textarea[name="photo[description]"] {
 	right: 5px;
 	width: 300px;
 }
+/* End of Map */
+
+/* Progress bar */
+.progress-holder{
+	margin-top: 200px;
+	display: none;
+}
+.progress-holder.show{
+	display: block;
+}
+.progress-holder .progress-rate{
+	font-weight: bold;
+	text-align: center;
+	font-size: 24px;
+}
+/* End of Progress bar */
