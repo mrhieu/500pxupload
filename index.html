@@ -31,6 +31,14 @@
 			</div>
 		</div>
 		
+		<!-- Progress bar -->
+		<div class="progress-holder" style="display: block;">
+			<div class="progress-rate">30%</div>
+			<div class="progress progress-striped progress-upload active">
+				<div class="bar" style="width: 30%;"></div>
+			</div>
+		</div>
+		
 		<!-- Drag zone -->
 		<div class="container text-center start-zone">
 			<form id="fileupload" action="server/php/index.php" method="POST" enctype="multipart/form-data">
@@ -108,15 +116,15 @@
 							<div class="row">
 								<label class="col-md-5 control-label">Shutter Speed</label>
 								{% 
-                  var shutterSpeed = '';
-                  if (o.ExposureTime){
-                    if (o.ExposureTime < 1){
-                      shutterSpeed = '1/' + Math.round(1/o.ExposureTime);
-                    } else{
-                      shutterSpeed = o.ExposureTime;
-                    }
-                  } 
-                %}
+									var shutterSpeed = '';
+									if (o.ExposureTime){
+										if (o.ExposureTime < 1){
+											shutterSpeed = '1/' + Math.round(1/o.ExposureTime);
+										} else{
+											shutterSpeed = o.ExposureTime;
+										}
+									} 
+								%}
 								<input type="text" class="col-md-7 input-sm instant-edit" name="photo[exif][shutterspeed]" placeholder="Set Shutter Speed" value="{%= shutterSpeed %}"/>
 							</div>
 
@@ -134,16 +142,16 @@
 								<label class="col-md-5 control-label">Taken</label>
 								{%
 									var dateTimeOriginal = o.DateTimeOriginal || o.DateTime || '';
-		              if (dateTimeOriginal){
-		                var time = dateTimeOriginal;
-		                time = time.split(' ');
-		                odate = time[0].replace(/\:/gi, '/');
-		                otime = time[1].substring(0, 5);
-		                dateTimeOriginal = odate + ' ' + otime;
-		              }
-		            %}
-		            
-		            <div class="col-md-1"><i class="glyphicon glyphicon-calendar"></i></div>
+									if (dateTimeOriginal){
+										var time = dateTimeOriginal;
+										time = time.split(' ');
+										odate = time[0].replace(/\:/gi, '/');
+										otime = time[1].substring(0, 5);
+										dateTimeOriginal = odate + ' ' + otime;
+									}
+								%}
+								
+								<div class="col-md-1"><i class="glyphicon glyphicon-calendar"></i></div>
 								<input type="text" class="col-md-3 input-sm instant-edit datepicker" name="photo[exif][taken][0]" placeholder="Set Date" value="{%=dateTimeOriginal?odate:''%}" readonly="true"/>
 								<div class="col-md-1"><i class="glyphicon glyphicon-time"></i></div>
 								<input type="text" class="col-md-2 input-sm instant-edit timepicker" name="photo[exif][taken][1]" placeholder="Set Time" value="{%=dateTimeOriginal?otime:''%}"/>
@@ -197,9 +205,9 @@
 									<img src="http://placehold.it/360x240&text=Googlemap"/>
 								</div>
 								<input type="text" class="form-control map-search" placeholder="Search for location..."/>
-			          <input type="hidden" class="photoLat" name="photo[latitude]" value="{%=o.GPSLatitude?o.GPSLatitude:''%}"/>
-			          <input type="hidden" class="photoLon" name="photo[longitude]" value="{%=o.GPSLongitude?o.GPSLongitude:''%}"/>
-			         </div>
+								<input type="hidden" class="photoLat" name="photo[latitude]" value="{%=o.GPSLatitude?o.GPSLatitude:''%}"/>
+								<input type="hidden" class="photoLon" name="photo[longitude]" value="{%=o.GPSLongitude?o.GPSLongitude:''%}"/>
+							 </div>
 						</div>
 					</div>
 				</form>
