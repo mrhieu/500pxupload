@@ -29,32 +29,36 @@
 			</div>
 		</div>
 		
-		<!-- Drag zone -->
-		<div class="container text-center start-zone">
-			<form id="fileupload" action="server/php/index.php" method="POST" enctype="multipart/form-data">
-				<input type="file" id="input-browse" class="block-hide" multiple="multiple" name="photo[image]">
-				<p>Drag photos from your computer in here. Select as many as you want.</p>
-				<div class="help-block">You can kill your browser with dropping 10 files in a row with 10MB each though (o.O)</div>
-				<p>You can also <a class="browse_files" href="#">browse</a> for photos to upload.</p>
-			</form>
-		</div>	
-
-
-		<script type="text/x-tmpl" id="tmpl-uploadThumbnail">
-			<li class="{%=o.active?'active':'' %}">
-				<a href="#photo-{%=o.index %}" class="upload-thumbnail photo_{%=o.index %} {%= o.hasGPS?'ready':'' %}">
-					<i class="glyphicon glyphicon-ok-sign" title="has location information"></i>
-					<img src="{%=o.imageSrc %}" width="64" height="64" alt="{%=o.filename %}"/>
-				</a>
-			</li>
+		<!-- Photo list -->
+		<div class="container">
+			<div class="row photoList">
+			</div>
+		</div>
+		
+		<script type="text/x-tmpl" id="tmpl-photoItem">
+			<div class="col-md-3 item">
+				<div class="panel panel-default">
+				  <div class="panel-body">
+				    <img class="img-rounded" src="http://placehold.it/231x{%=o.height%}&text=Photo"/>
+				  </div>
+				  <div class="panel-footer">Panel footer</div>
+				</div>
+			</div>
 		</script>
 
 		<script src="js/jquery-1.10.2.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 		<script src="js/tmpl.min.js"></script>
 		<script src="js/jquery.resizeimagetoparent.min.js"></script>
+		<script src="js/masonry.min.js"></script>
 		<script>
-			
+			duplicatePhoto = function() {
+				for (var i = 1; i < 30; i++){
+					$('.photoList').append(tmpl("tmpl-photoItem", {height: parseInt(101 + Math.random()*100) }));
+				}
+
+				setTimeout(function(){$('.photoList').masonry();}, 500);
+			}();
 		</script>
 		<script src="js/live.js"></script>
 	</body>
