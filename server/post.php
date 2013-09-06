@@ -21,8 +21,7 @@ if ((($_FILES["files"]["type"] == "image/jpeg")
     if (file_exists("upload/" . $_FILES["files"]["name"])) {
       // echo $_FILES["files"]["name"] . " already exists. ";
     } else {
-      move_uploaded_file($_FILES["files"]["tmp_name"],
-      "upload/" . $_FILES["files"]["name"]);
+      // move_uploaded_file($_FILES["files"]["tmp_name"], "upload/" . $_FILES["files"]["name"]);
       echo json_encode(array('filename' => $_FILES["files"]["name"]));
     }
   }
