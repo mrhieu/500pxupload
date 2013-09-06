@@ -31,11 +31,16 @@
 		
 		<!-- Photo list -->
 		<div class="container">
-			<div class="row photoList">
+			<div class="row photoList text-center">
 				<h2>No uploaded photos</h2>
+			</div>
+			<div class="row text-center">
+				<button type="button" class="btn btn-danger btn-remove remove" style="display: none"><i class="glyphicon glyphicon-trash"></i> remove</button>
 			</div>
 		</div>
 		
+
+
 		<script type="text/x-tmpl" id="tmpl-photoItem">
 			<div class="col-md-3 col-xs-6 item">
 				<div class="panel panel-default">
@@ -61,8 +66,18 @@
 				    html += tmpl("tmpl-photoItem", {filename: i, imageData: photos[i]});
 				  }
 				}
-				$('.photoList').empty().append(html);
-				setTimeout(function(){$('.photoList').masonry();}, 500);
+
+				if (html) {
+					$('.photoList').empty().append(html);
+					setTimeout(function(){$('.photoList').masonry();}, 500);
+					$('.remove').show().on('click', function() {
+						$('.photoList').empty();
+						if (window.sessionStorage){
+							sessionStorage.clear();
+						}
+					});
+
+				}
 			}
 		</script>
 		<!--script src="js/live.js"></script-->
