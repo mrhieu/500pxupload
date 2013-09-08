@@ -153,10 +153,10 @@ function setupUploader() {
 		done : function(e, data) {
 			console.log(data.files[0].name + '<-- DONE');
 			
-			//Store image data into HTML5 sessionStorage to display right after uploading
-			if (window.sessionStorage){
+			//Store image data into HTML5 localStorage to display right after uploading
+			if (window.localStorage){
 				var imageData = $('.upload-thumbnail.photo_' + data.context + ' img').attr('src');
-				sessionStorage.setItem('photo_' + data.files[0].name.substring(0, 20), imageData);
+				localStorage.setItem('photo500_' + data.files[0].name.substring(0, 20), imageData);
 			}
 		},
 
@@ -209,8 +209,6 @@ function setupUploader() {
 		// $('.edit-zone').removeClass('active');
 		$('.map').addClass('disabled');
 		$('.edit-zone input, .edit-zone textarea, .edit-zone select').attr('readonly', 'true');
-
-		
 
 		for (i in filesToUpload){
 			filesToUpload[i].submit();
@@ -382,8 +380,8 @@ function initFormHelper(){
 		maximumSelectionSize: 3,
 		placeholder: $(this).attr('placeholder'),
 		tags: [],
-		tokenSeparators: [","],
-		width: '360px'
+		tokenSeparators: [","]
+		// width: '360px'
 	});
 
 	$('.edit-zone.active .datepicker').datepicker({
@@ -398,7 +396,7 @@ function initFormHelper(){
 }
 
 function clearClientStorage() {
-	if (window.sessionStorage){
-		sessionStorage.clear();
+	if (window.localStorage){
+		localStorage.clear();
 	}
 }
