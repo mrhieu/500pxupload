@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+		<link href="css/select2.css" rel="stylesheet" type="text/css">
+		<link href="css/app.css" rel="stylesheet" type="text/css">
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<title>500px style Photo uploader</title>
+	</head>
+	<body>
+		<!-- Header -->
+		<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="index.html"><strong>500px-like uploader</strong></a>
+				</div>
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li><a class="highlight" href="uploaded.html">Uploaded photos</a></li>
+						<li><a href="http://mrhieu.github.io/500pxupload/">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Photo list -->
+		<div class="container">
+			<div class="row photoList text-center">
+				<h2>No uploaded photos</h2>
+			</div>
+			<div class="row">
+				<p class="text-center">
+					<button type="button" class="btn btn-danger btn-remove remove" style="display: none"><i class="glyphicon glyphicon-trash"></i> remove</button>
+				</p>
+			</div>
+		</div>
+
+		<script type="text/x-tmpl" id="tmpl-photoItem">
+			<div class="col-md-3 col-xs-6 item">
+				<div class="panel panel-default">
+				  <div class="panel-body">
+				    <img class="img-rounded" src="{%= o.imageData %}"/>
+				  </div>
+				  <div class="panel-footer">{%= o.filename%}</div>
+				</div>
+			</div>
+		</script>
+
+		<script src="js/jquery-1.10.2.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/tmpl.min.js"></script>
+		<script src="js/jquery.resizeimagetoparent.min.js"></script>
+		<script src="js/masonry.min.js"></script>
+		<script>
+			var REVIEW = function() {
+				if (window.localStorage){
+					var photos = window.localStorage;
+					var html = '';
+					for (var i in photos) {
+					  if (photos.hasOwnProperty(i) && i.match(/photo500_/gi) ) {
+					    html += tmpl("tmpl-photoItem", {filename: i, imageData: photos[i]});
+					  }
+					}
+
+					if (html) {
+						$('.photoList').empty().append(html);
+						setTimeout(function(){$('.photoList').masonry();}, 500);
+						$('.remove').show().on('click', function() {
+							$('.photoList').empty();
+							if (window.localStorage){
+								localStorage.clear();
+							}
+						});
+					}
+				}
+			}();
+		</script>
+		<!--script src="js/live.js"></script-->
+	</body>
+</html>

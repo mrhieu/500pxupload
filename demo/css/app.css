@@ -1,0 +1,196 @@
+/*@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700);*/
+body {
+	/*font-weight: 300;
+	font-family: 'Lato', Calibri, Arial, sans-serif;*/
+	padding-top: 70px;
+}
+
+/* Common */
+.thin-font{
+	font-weight: 300;
+	font-family: 'Lato', Calibri, Arial, sans-serif;
+}
+.block-hide{
+	display: none!important;
+}
+textarea{resize: none}
+
+/* Start zone */
+.start-zone{
+	padding: 100px;
+}
+.start-zone p{
+	font-size: 24px;
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+.browse_files{
+	text-decoration: underline;
+}
+.highlight{
+	color: #fff !important;
+}
+
+/* Preview zone */
+.preview-zone{
+	margin: 50px auto;
+}
+.preview-zone img{
+	height: 500px;
+	display: block;
+	margin: 0 auto;
+}
+
+/* Thumbnail zone */
+.thumbnail-zone{
+	margin-bottom: 30px;
+}
+.thumbnails-holder .upload-thumbnail{
+	display: block;
+	float: left;
+	height: 64px;
+	width: 64px;
+	overflow: hidden;
+	border-radius: 0!important;
+}
+.upload-thumbnail .glyphicon-ok-sign{
+	color: #5CB85C;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	background: #fff;
+	display: none;
+	border-radius: 50%;
+}
+.upload-thumbnail.ready .glyphicon-ok-sign{
+	display: block;
+}
+.thumbnails-holder .active{
+	border-bottom: 2px solid #428bca;
+	padding-bottom: 10px;
+}
+.thumbnail-zone .nav>li{
+	margin: 10px 10px 10px 0;
+	padding-bottom: 10px;
+}
+.thumbnail-zone .nav>li>a, .thumbnail-zone .nav>li>a:hover{
+	padding: 0;
+	border: none;
+	margin-right: 0;
+}
+.thumbnail-zone .actions{
+	margin-top: 20px;
+}
+.thumbnail-zone .nav-tabs{
+	border: none;
+}
+
+/* Edit zone */
+.container-fluid{
+	width: 100%;
+	background: #f7f8fa;
+	padding: 20px 0 50px;
+}
+.label-main{
+	font-size: 14px;
+	font-weight: bold;
+	color: #428bca;
+}
+.photo-title{
+	font-size: 26px;
+	font-weight: bold;
+	margin-left: -5px;
+	padding-left: 5px
+}
+.instant-edit{
+	border: none;
+	background: none;
+	box-shadow: none;
+}
+.instant-edit:focus{
+	border: 1px solid #66afe9;
+	background: #fff;
+}
+.exif{
+	font-size: 12px;
+}
+.exif .row label{
+	margin-top: 5px;
+}
+.exif .glyphicon{
+	padding-top: 6px;
+}
+.edit-zone .map-canvas{
+	/*width: 360px;*/
+	height: 240px;
+}
+textarea[name="photo[description]"] {
+	margin-bottom: 56px;
+}
+
+/* custom style for Select2 */
+.select2-choices {
+	background: none !important;
+	border: none !important;
+	box-shadow: none!important;
+	/*width: 340px;*/
+	margin: -3px 0 0 -10px!important;
+}
+.select2-drop-active{
+	border: none; 
+	border-radius: 0
+}
+.select2-search-field input{
+	margin: 0;
+	padding-top: 3px!important ;
+}
+/* End of custom style for Select2 */
+
+/* Custom style for Timepicker */
+.ui-timepicker-list .ui-timepicker-selected:hover {
+	background: #478BCA;
+}
+
+/* Map */
+.map {
+	position: relative;
+}
+.map.disabled:before{
+	content: '';
+	z-index: 999;
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	right: 0;
+}
+.map-search{
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	width: 70%;
+}
+/* End of Map */
+
+/* Progress bar */
+.progress-holder{
+	margin-top: 200px;
+	display: none;
+}
+.progress-holder.show{
+	display: block;
+}
+.progress-holder .progress-rate{
+	font-weight: bold;
+	text-align: center;
+	font-size: 24px;
+}
+/* End of Progress bar */
+
+.panel-body img {
+	max-width: 100%;
+}
+.panel-footer {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
