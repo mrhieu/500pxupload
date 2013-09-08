@@ -208,7 +208,7 @@
 							<label class="label-main">MAP</label>
 							<div class="map row">
 								<div class="map-canvas col-md-12">
-									<img src="http://placehold.it/360x240&text=Googlemap"/>
+									<img src="http://placehold.it/360x240&text=Googlemap" style="max-width: 100%"/>
 								</div>
 								<input type="text" class="form-control map-search" placeholder="Search for location..."/>
 								<input type="hidden" class="photoLat" name="photo[latitude]" value="{%=o.GPSLatitude?o.GPSLatitude:''%}"/>
@@ -236,17 +236,6 @@
 		<script src="js/bootstrap-datepicker.js"></script>
 		<script src="js/jquery.timepicker.js"></script>
 		<script src="js/app.js"></script>
-		<script>
-			$(function () {
-				$(document).on('click', '#myTab a', function (e) {
-					e.preventDefault();
-					if (!$(this).closest('li').hasClass('active')) {
-						$(this).tab('show');
-						tabSelect($(this));
-					}
-				})
-			})
-		</script>
 		<!--script src="js/live.js"></script-->
 	</body>
 </html>

@@ -58,8 +58,7 @@
 		<script src="js/jquery.resizeimagetoparent.min.js"></script>
 		<script src="js/masonry.min.js"></script>
 		<script>
-			var REVIEW = window.REVIEW || {}
-			REVIEW.init = function() {
+			var REVIEW = function() {
 				if (window.localStorage){
 					var photos = window.localStorage;
 					var html = '';
@@ -80,8 +79,7 @@
 						});
 					}
 				}
-			}
-			REVIEW.init();
+			}();
 		</script>
 		<!--script src="js/live.js"></script-->
 	</body>
