@@ -6,6 +6,21 @@ $(function () {
 		return false;
 	});
 
+	// Snap.js
+	var snapper = new Snap({
+    element: document.getElementById('content-wrapper'),
+    disable: 'right'
+  });
+  $('#open-left').on('click', function() {
+  	if ($(this).hasClass('active')) {
+  		snapper.close();
+  	} else{
+  		snapper.open('left');	
+  	}
+  	$(this).toggleClass('active');
+  });
+  $(window).resize(function() {snapper.close()});
+
 	var uploader = FIVE();
 	uploader.init();
 })
