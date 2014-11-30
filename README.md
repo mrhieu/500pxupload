@@ -1,11 +1,17 @@
 # 500px-like Photo Uploader
 ### Build a photo uploader with 500px.com-inspired.
 ![preview](https://raw.github.com/mrhieu/500pxupload/b94f090ee11d6023d2eaae3fcd66f96bd696fad8/img/preview.jpg)
-### Feel free to modify and re-use.
-### See a demo at [here](http://mrhieu.github.io/500pxupload/demo). Anyway, I didn't setup server-side for public access. Any ideas ?
+### Feel free to modify and use in your projects.
+### See a demo [here](http://mrhieu.github.io/500pxupload/demo)
+
+## How to run
+```
+$ npm install
+$ grunt serve
+```
 
 ## Feature
-* Drag and drop
+* Drag and drop files
 * Multiple upload
 * Preview thumnail
 * Exif reading

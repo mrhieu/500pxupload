@@ -74,7 +74,7 @@
 			
 			<!-- Drag zone -->
 			<div class="container text-center start-zone">
-				<form id="fileupload" action="server/post.php" method="POST" enctype="multipart/form-data">
+				<form id="fileupload" action="http://five00pxupload.herokuapp.com/server/post.php" method="POST" enctype="multipart/form-data">
 					<input type="file" id="input-browse" class="block-hide" multiple="multiple" name="files">
 					<p>Drag photos from your computer in here. Select as many as you want.</p>
 					<div class="help-block">Anyway, you can kill your browser with dropping 10 files in a row with 10MB each (o.O)</div>
@@ -235,7 +235,7 @@
 						<div class="col-md-4">
 							<label class="label-main">MAP</label>
 							<div class="map row">
-								<div class="map-canvas col-md-12">
+								<div class="map-canvas col-md-12" data-snap-ignore="true">
 									<img src="http://placehold.it/360x240&text=Googlemap" style="max-width: 100%"/>
 								</div>
 								<input type="text" class="form-control map-search" placeholder="Search for location..."/>
