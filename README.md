@@ -1,5 +1,7 @@
 # 500px-like Photo Uploader
 ### Build a photo uploader with 500px.com-inspired.
+
+[![Join the chat at https://gitter.im/mrhieu/500pxupload](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mrhieu/500pxupload?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ![preview](https://raw.github.com/mrhieu/500pxupload/b94f090ee11d6023d2eaae3fcd66f96bd696fad8/img/preview.jpg)
 ### Feel free to modify and use in your projects.
 ### See a demo [here](http://mrhieu.github.io/500pxupload/demo)
